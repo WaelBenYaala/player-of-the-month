@@ -83,3 +83,5 @@ Route::controller(voterController::class)->group(function() {
 });
 
 
+
+Route::get('/health', fn () => response()->json(['status' => 'healthy']));
