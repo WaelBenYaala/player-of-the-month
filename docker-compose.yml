@@ -1,0 +1,39 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file: .env
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: player_of_the_month
+      DB_USERNAME: demo
+      DB_PASSWORD: demopass
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - appnet
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demopass
+      POSTGRES_DB: player_of_the_month
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d player_of_the_month"]
+      interval: 5s
+      retries: 5
+    networks:
+      - appnet
+
+volumes:
+  pgdata:
+
+networks:
+  appnet:
