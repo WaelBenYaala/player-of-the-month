@@ -7,6 +7,7 @@ on:
 
 env:
   IMAGE_NAME: player-of-the-month
+  REGISTRY: localhost:5000
 
 jobs:
   test:
@@ -25,8 +26,10 @@ jobs:
     runs-on: [self-hosted, windows, local]
     steps:
       - uses: actions/checkout@v4
-      - name: Construction de l'image Docker
+      - name: Construction et push de l'image Docker vers le registre privé
         run: |
-          docker build -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
-          docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:latest
-          echo "Image construite : ${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          echo "Image construite et poussée : ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
